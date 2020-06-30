@@ -7,3 +7,14 @@ class Song(models.Model):
 
     duration = models.PositiveIntegerField(blank=True, null=True)
     lyrics = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.title
+
+
+class Playlist(models.Model):
+    name = models.CharField(max_length=256)
+    songs = models.ManyToManyField(Song)
+
+    def __str__(self):
+        return self.name

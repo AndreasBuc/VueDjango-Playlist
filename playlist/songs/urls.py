@@ -4,6 +4,7 @@ from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register('songs', apiviews.SongsViewSet)
+router.register('playlists', apiviews.PlaylistViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),
