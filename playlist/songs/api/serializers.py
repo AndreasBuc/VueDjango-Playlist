@@ -2,13 +2,49 @@ from rest_framework import serializers
 from songs.models import Song, Playlist
 
 
+class PlaylistWOSongDetailsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Playlist
+        exclude = ['songs', ]
+
+
 class SongSerializer(serializers.ModelSerializer):
+    playlists = serializers.SerializerMethodField()
+    playlists_ids = serializers.SerializerMethodField()
+    is_in_playlist = serializers.SerializerMethodField()
+
     class Meta:
         model = Song
         fields = '__all__'
 
+    def get_playlists_ids(self, instance):
+        return [playlist.id for playlist in list(instance.playlists.all())]
+
+    def get_playlists(self, instance):
+        playserializer = PlaylistWOSongDetailsSerializer(instance.playlists, many=True)
+        return playserializer.data
+
+    def get_is_in_playlist(self, instance):
+        return instance.playlists.all().exists()
+
+
+class SongIDSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Song
+        fields = ['id']
+
 
 class PlaylistSerializer(serializers.ModelSerializer):
+    songs = SongIDSerializer(many=True)
+    is_empty = serializers.SerializerMethodField()
+
     class Meta:
         model = Playlist
         fields = '__all__'
+        # the depth is just good for GET method
+        # depth = 1
+
+    def get_is_empty(self, instance):
+        return not instance.songs.all().exists()

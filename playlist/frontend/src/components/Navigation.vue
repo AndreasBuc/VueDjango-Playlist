@@ -6,7 +6,7 @@
       <router-link
         :to="{ name: 'home' }"
         class="navbar-brand"
-        >Playlist
+        >Songs
       </router-link></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -20,6 +20,12 @@
             class="navbar-brand"
             >Add Song
           </router-link><span class="sr-only">(current)</span></a>
+          <li class="nav-item active">
+            <a class="nav-link" href=""><router-link
+              :to="{ name: 'my-playlist' }"
+              class="navbar-brand"
+              >My Playlists
+            </router-link><span class="sr-only">(current)</span></a>
         </li>
       </ul>
     </div>

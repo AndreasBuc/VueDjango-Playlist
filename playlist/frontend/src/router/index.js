@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
 import AddSong from "@/views/AddSong.vue";
+import MyPlaylist from "@/views/MyPlaylists.vue";
 Vue.use(VueRouter);
 
 const routes = [
@@ -14,6 +15,11 @@ const routes = [
     path: "/addSong",
     name: "add-song",
     component: AddSong
+  },
+  {
+    path: "/myPlaylist",
+    name: "my-playlist",
+    component: MyPlaylist
   },
   {
     path: "/editSong/:id?",

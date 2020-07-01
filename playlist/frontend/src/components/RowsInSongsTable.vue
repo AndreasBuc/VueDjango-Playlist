@@ -1,0 +1,202 @@
+<template>
+  <tr @mouseleave="deletehover = false; edithover = false; addhover=false" >
+    <th scope="row">{{songIndex}}</th>
+    <td>{{song.title}}</td>
+    <td>{{song.artist}}</td>
+    <td>{{setDuration(song.duration)}}</td>
+    <td>
+      <ul class="nav">
+        <!-- EDIT the song -->
+        <li class="nav-item mx-1">
+          <router-link
+            :to="{ name: 'song-editor', params: {id: song.id} }"
+            ><a
+            href="">
+
+            <div @mouseover="edithover = true">
+              <img v-if="!edithover" class="icon" alt="Edit" src="../assets/edit.svg">
+            </div>
+            <div @mouseleave="edithover = false">
+              <img v-if="edithover" class="icon" alt="Edit" src="../assets/edit-hover.svg">
+            </div>
+          </a>
+          </router-link>
+        </li>
+        <!-- DELETE the song -->
+        <li class="nav-item mx-1" >
+          <div @mouseover="deletehover = true" >
+            <a @click="deleteSong" href=""><img v-if="!deletehover" class="icon" alt="Edit" src="../assets/delete.svg"></a>
+          </div>
+          <div @mouseleave="deletehover = false">
+            <a @click="deleteSong" href=""><img v-if="deletehover" class="icon" alt="Edit" src="../assets/delete-hover.svg"></a>
+          </div>
+        </li>
+        <!-- ADD the song to a playlist-->
+        <li class="nav-item mx-1" >
+          <div @mouseover="addhover = true" data-toggle="modal" data-target="'#AddToPlaylistModal'+ songID" >
+            <a  href=""><img class="icon" v-if="!addhover" @mouseover="addhover = true" alt="add to playlist" src="../assets/plus.svg"></a>
+          </div>
+          <div @mouseleave="addhover = false">
+            <a data-toggle="modal" :data-target="'#Modal' + songID" @click="getPlaylists" href=""><img class="icon" v-if="addhover" @mouseover="addhover = true" alt="add to playlist" src="../assets/plus-hover.svg"></a>
+          </div>
+
+          <!-- Modal -->
+          <div class="modal fade" :id="'Modal' + songID" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content modal-style">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Choose a Playlist</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+
+                </div>
+                <div class="modal-body">
+                  <div class="btn-group-vertical">
+                    <a  href=""
+                        >
+                      <button
+                        v-for="playlist in PlaylistsNotInYet"
+                        :key="playlist.id"
+                        @click="AddToPlaylist(playlist.id)"
+                        class="btn btn-outline-dark modal-style"
+                        data-dismiss="modal"
+                        >{{playlist.name}}
+                      </button>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Modal Ende-->
+
+        </li>
+      </ul>
+    </td>
+  </tr>
+
+</template>
+
+<script>
+import { apiService } from "@/common/api.service.js"
+export default {
+  name: 'RowInSongsTable',
+  props: {
+    id: Number,
+    index: Number,
+  },
+  data() {
+    return {
+      playlists: [],
+      song: [],
+      songID: this.id,
+      songIndex: this.index,
+      edithover: false,
+      deletehover: false,
+      plushover: false,
+      minushover: false,
+      addhover: false,
+    }
+  },
+  methods: {
+
+    getSong() {
+      let endpoint = `/api/songs/${this.songID}/`;
+      apiService(endpoint)
+      .then(data => {
+        this.song=data
+      })
+    },
+    getPlaylists() {
+      let endpoint = "/api/playlists-wo-spongs-details/";
+      apiService(endpoint)
+      .then(playlists => {
+
+        this.playlists=playlists;
+      })
+    },
+    setBackHoverValue() {
+      this.edithover= false;
+      this.deletehover= false;
+      this.plushover= false;
+      this.minushover= false;
+    },
+    setDuration(duration) {
+      var sec = duration % 60 ;
+      var min = (duration-sec)/60;
+      if (sec==0){
+        sec= '00'
+      }
+      return min + ':' + sec
+    },
+    async deleteSong() {
+        let endpoint = `/api/songs/${this.songID}/`;
+        try {
+          await apiService(endpoint, "DELETE")
+            .then(()=> {
+              this.$router.push({
+                name: 'home'
+              })
+            })
+          // this.$delete(this.answers, this.answers.indexOf(answer))
+          // this.userHasAnswered = false;
+        }
+        catch (err) {
+          console.log(err)
+        }
+      },
+      async AddToPlaylist(p_pk) {
+          let endpoint = `/api/add-remove-song/${p_pk}/${this.songID}/`;
+          try {
+            await apiService(endpoint, "POST")
+              .then(()=> {
+                this.$router.push({
+                  name: 'home'
+                })
+              })
+            // this.$delete(this.answers, this.answers.indexOf(answer))
+            // this.userHasAnswered = false;
+          }
+          catch (err) {
+            console.log(err)
+          }
+        },
+    },
+  created() {
+    this.setBackHoverValue()
+    this.getSong()
+  },
+  // Hier fängt computed an
+  computed: {
+    PlaylistsNotInYet() {
+      var addPlaylist = []
+
+      var playlists_ids = this.song.playlists_ids;
+      this.playlists.forEach(function (playlist) {
+        if(!playlists_ids.includes(playlist.id)) {
+          addPlaylist.push(playlist);
+        }
+      });
+      return addPlaylist;
+    },
+  },
+  // hier hört computed auf
+}
+</script>
+
+<style scoped>
+table, th, td {
+  border: 1px solid #63ace5 !important;
+  border-collapse: collapse;
+}
+.icon {
+  height: 24px;
+  weight: 24px;
+  padding: 2px 2px 2px 2px  ;
+}
+.modal-style {
+  background-color: #4a4e4d;
+  color: #63ace5;
+}
+</style>
