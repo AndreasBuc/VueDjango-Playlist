@@ -113,7 +113,7 @@ export default {
 
   methods: {
     getSong() {
-      let endpoint = `/api/songs/${this.songID}/`;
+      let endpoint = `/api/users-songs/${this.songID}/`;
       console.log('Song is fetched by ID')
       apiService(endpoint)
       .then(data => {
@@ -122,7 +122,7 @@ export default {
       })
     },
     async removePlaylist(p_pk) {
-      let endpoint = `/api/add-remove-song/${p_pk}/${this.songID}/`;
+      let endpoint = `/api/users-add-remove-song/${p_pk}/${this.songID}/`;
       console.log('Song is fetched by ID')
       await apiService(endpoint, "DELETE")
 
@@ -148,7 +148,7 @@ export default {
 
     },
     async deleteSong() {
-        let endpoint = `/api/songs/${this.songID}/`;
+        let endpoint = `/api/users-songs/${this.songID}/`;
         try {
           await apiService(endpoint, "DELETE")
             .then(()=> {

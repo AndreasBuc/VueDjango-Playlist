@@ -102,14 +102,14 @@ export default {
   methods: {
 
     getSong() {
-      let endpoint = `/api/songs/${this.songID}/`;
+      let endpoint = `/api/users-songs/${this.songID}/`;
       apiService(endpoint)
       .then(data => {
         this.song=data
       })
     },
     getPlaylists() {
-      let endpoint = "/api/playlists-wo-spongs-details/";
+      let endpoint = "/api/users-playlists-wo-spongs-details/";
       apiService(endpoint)
       .then(playlists => {
 
@@ -123,6 +123,9 @@ export default {
       this.minushover= false;
     },
     setDuration(duration) {
+      if (duration == null) {
+        return ''
+      }
       var sec = duration % 60 ;
       var min = (duration-sec)/60;
       if (sec==0){
@@ -131,7 +134,7 @@ export default {
       return min + ':' + sec
     },
     async deleteSong() {
-        let endpoint = `/api/songs/${this.songID}/`;
+        let endpoint = `/api/users-songs/${this.songID}/`;
         try {
           await apiService(endpoint, "DELETE")
             .then(()=> {
@@ -147,7 +150,7 @@ export default {
         }
       },
       async AddToPlaylist(p_pk) {
-          let endpoint = `/api/add-remove-song/${p_pk}/${this.songID}/`;
+          let endpoint = `/api/users-add-remove-song/${p_pk}/${this.songID}/`;
           try {
             await apiService(endpoint, "POST")
               .then(()=> {

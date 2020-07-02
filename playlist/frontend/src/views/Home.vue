@@ -73,7 +73,7 @@
 import { apiService } from "@/common/api.service.js"
 import RowInSongsTable from "@/components/RowsInSongsTable"
 export default {
-  name: 'Home',
+  name: 'MySongs',
   components: {
     RowInSongsTable,
   },
@@ -83,9 +83,9 @@ export default {
       requestUserID: null,
       songs: [],
       songs_ids: [],
-      title: '',
-      artist: '',
-      duration: '',
+      title: null,
+      artist: null,
+      duration: null,
       showaddSong: false,
       addhover: false,
       deletehover: false,
@@ -114,7 +114,7 @@ export default {
     },
     getSongs() {
       // let endpoint = "/api/songs-ids/";
-      let endpoint = "/api/songs/";
+      let endpoint = "/api/users-songs/";
 
       apiService(endpoint)
       .then(data => {
@@ -123,21 +123,11 @@ export default {
     },
     getSongsIDs() {
       // let endpoint = "/api/songs-ids/";
-      let endpoint = "/api/songs-ids/";
+      let endpoint = "/api/users-songs-ids/";
 
-      console.log('Songs IDs are beeing fetched')
       apiService(endpoint)
       .then(data => {
         this.songs_ids=data;
-      })
-    },
-    getCurrentUser() {
-      let endpoint = "/api/users/";
-      apiService(endpoint)
-      .then(data => {
-        console.log('the User is:');
-        console.log(data);
-        this.user=data
       })
     },
     async onSubmit(){
@@ -146,7 +136,7 @@ export default {
         } else if (this.title.length > 240) {
         this.error = "Ensure this field has no more than 240 char ";
         }  else {
-          let endpoint = "/api/songs/";
+          let endpoint = "/api/users-songs/";
           let method = "POST";
 
           await apiService(endpoint, method, {  title: this.title,
@@ -162,7 +152,6 @@ export default {
   },
   created() {
     this.getSongsIDs()
-    this.getCurrentUser()
     this.setRequestUser()
   }
 }

@@ -9,7 +9,7 @@ from songs.models import Song, Playlist
 from rest_framework.permissions import IsAuthenticated
 
 
-class SongsViewSet(viewsets.ModelViewSet):
+class UsersSongsViewSet(viewsets.ModelViewSet):
     serializer_class = SongSerializer
     permission_classes = [IsAuthenticated]
 
@@ -21,7 +21,7 @@ class SongsViewSet(viewsets.ModelViewSet):
         serializer.save(creator=self.request.user)
 
 
-class SongsIDViewSet(viewsets.ModelViewSet):
+class UsersSongsIDViewSet(viewsets.ModelViewSet):
     serializer_class = SongIDSerializer
     permission_classes = [IsAuthenticated]
 
@@ -29,25 +29,31 @@ class SongsIDViewSet(viewsets.ModelViewSet):
         return Song.objects.all().filter(creator_id=self.request.user.id).order_by("-id")
 
 
-class PlaylistViewSet(viewsets.ModelViewSet):
-    queryset = Playlist.objects.all().order_by("name")
+class UsersPlaylistViewSet(viewsets.ModelViewSet):
     serializer_class = PlaylistSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Playlist.objects.all().filter(owner_id=self.request.user.id).order_by("name")
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
 
-class PlaylistWOSongDetailsViewSet(viewsets.ModelViewSet):
-    queryset = Playlist.objects.all().order_by("name")
+class UsersPlaylistWOSongDetailsViewSet(viewsets.ModelViewSet):
     serializer_class = PlaylistWOSongDetailsSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        return Playlist.objects.all().filter(owner_id=self.request.user.id).order_by("name")
 
-class PlaylistAddRemoveAPIView(APIView):
-    queryset = Playlist.objects.all().order_by("-id")
+
+class UsersPlaylistAddRemoveAPIView(APIView):
     serializer_class = PlaylistSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Playlist.objects.all().filter(owner_id=self.request.user.id).order_by("name")
 
     def delete(self, request, p_pk, s_pk):
         """Remove request.user from the voters queryset of an answer instance."""

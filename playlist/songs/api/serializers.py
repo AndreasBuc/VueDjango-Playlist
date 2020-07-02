@@ -8,7 +8,7 @@ class PlaylistWOSongDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Playlist
-        exclude = ['songs', 'owner_id']
+        exclude = ['songs']
 
 
 class SongSerializer(serializers.ModelSerializer):
@@ -47,7 +47,7 @@ class PlaylistSerializer(serializers.ModelSerializer):
     owner = serializers.StringRelatedField(read_only=True)
     owner_id = serializers.PrimaryKeyRelatedField(read_only=True)
 
-    songs = SongIDSerializer(many=True)
+    songs = SongIDSerializer(many=True, read_only=True)
     is_empty = serializers.SerializerMethodField()
 
     class Meta:
