@@ -37,10 +37,23 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+
     'rest_framework',
+    'rest_framework.authtoken',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+
+    'rest_auth',
+    'rest_auth.registration',
+
     'crispy_forms',
     'webpack_loader',
+
     'songs',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -123,11 +136,17 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+LOGIN_URL = "accounts/login/"
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "assets"),
     os.path.join(BASE_DIR, "frontend/dist"),
 ]
 
+# This is for the custom user model
+AUTH_USER_MODEL = 'users.CustomUser'
 
 # This is for the nice looking forms
 CRISPY_TEMPLATE_PACK = "bootstrap4"
@@ -136,6 +155,25 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "assets"),
     os.path.join(BASE_DIR, "frontend/dist"),
 ]
+
+# This is for the pagination of the single page
+SITE_ID = 1
+
+# This is for the Authentication
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_REQUIRED = (True)
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    # 'PAGE_SIZE': 4
+}
 
 WEBPACK_LOADER = {
     'DEFAULT': {

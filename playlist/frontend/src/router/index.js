@@ -12,11 +12,6 @@ const routes = [
     component: Home
   },
   {
-    path: "/addSong",
-    name: "add-song",
-    component: AddSong
-  },
-  {
     path: "/myPlaylist",
     name: "my-playlist",
     component: MyPlaylist

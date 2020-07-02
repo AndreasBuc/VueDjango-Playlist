@@ -4,12 +4,17 @@ from songs.models import Song, Playlist
 
 class PlaylistWOSongDetailsSerializer(serializers.ModelSerializer):
 
+    owner_id = serializers.PrimaryKeyRelatedField(read_only=True)
+
     class Meta:
         model = Playlist
-        exclude = ['songs', ]
+        exclude = ['songs', 'owner_id']
 
 
 class SongSerializer(serializers.ModelSerializer):
+    creator = serializers.StringRelatedField(read_only=True)
+    creator_id = serializers.PrimaryKeyRelatedField(read_only=True)
+
     playlists = serializers.SerializerMethodField()
     playlists_ids = serializers.SerializerMethodField()
     is_in_playlist = serializers.SerializerMethodField()
@@ -31,12 +36,17 @@ class SongSerializer(serializers.ModelSerializer):
 
 class SongIDSerializer(serializers.ModelSerializer):
 
+    creator_id = serializers.PrimaryKeyRelatedField(read_only=True)
+
     class Meta:
         model = Song
-        fields = ['id']
+        fields = ['id', 'creator_id']
 
 
 class PlaylistSerializer(serializers.ModelSerializer):
+    owner = serializers.StringRelatedField(read_only=True)
+    owner_id = serializers.PrimaryKeyRelatedField(read_only=True)
+
     songs = SongIDSerializer(many=True)
     is_empty = serializers.SerializerMethodField()
 

@@ -3,11 +3,11 @@ from songs.api import views as apiviews
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register('songs', apiviews.SongsViewSet)
-router.register('songs-ids', apiviews.SongsIDViewSet)
-router.register('playlists', apiviews.PlaylistViewSet)
+router.register('songs', apiviews.SongsViewSet, basename='songs-details')
+router.register('songs-ids', apiviews.SongsIDViewSet, basename='songs-ids')
+router.register('playlists', apiviews.PlaylistViewSet, basename='playlists-details')
 router.register('playlists-wo-spongs-details',
-                apiviews.PlaylistWOSongDetailsViewSet)
+                apiviews.PlaylistWOSongDetailsViewSet, basename='playlists-ids')
 
 urlpatterns = [
     path('', include(router.urls)),

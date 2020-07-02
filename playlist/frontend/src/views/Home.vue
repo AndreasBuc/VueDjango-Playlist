@@ -1,8 +1,9 @@
 <template>
   <div class="home">
     <div class="centerthecontext">
-      <h1>All Songs</h1>
-      <h3 class="lead"> Here are all the songs available</h3>
+      <h1>Hallo {{requestUser}}</h1>
+      <h3 class="lead"> Here are all your songs</h3>
+      <h3></h3>
       <hr class="blueline">
     </div>
 
@@ -78,6 +79,8 @@ export default {
   },
   data() {
     return {
+      requestUser: [],
+      requestUserID: null,
       songs: [],
       songs_ids: [],
       title: '',
@@ -100,6 +103,10 @@ export default {
     }
   },
   methods: {
+    setRequestUser() {
+        this.requestUser = window.localStorage.getItem("username");
+        this.requestUserID = window.localStorage.getItem("username_id");
+      },
     deleteAdding() {
       this.title = '';
       this.artist= '';
@@ -121,9 +128,16 @@ export default {
       console.log('Songs IDs are beeing fetched')
       apiService(endpoint)
       .then(data => {
-        console.log("data aus HOME: ");
+        this.songs_ids=data;
+      })
+    },
+    getCurrentUser() {
+      let endpoint = "/api/users/";
+      apiService(endpoint)
+      .then(data => {
+        console.log('the User is:');
         console.log(data);
-        this.songs_ids=data
+        this.user=data
       })
     },
     async onSubmit(){
@@ -148,6 +162,8 @@ export default {
   },
   created() {
     this.getSongsIDs()
+    this.getCurrentUser()
+    this.setRequestUser()
   }
 }
 </script>

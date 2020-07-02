@@ -6,7 +6,7 @@
       <router-link
         :to="{ name: 'home' }"
         class="navbar-brand"
-        >Songs
+        >My Songs
       </router-link></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -14,19 +14,24 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ml-auto">
-        <li class="nav-item active">
+        <!-- Dieser Link ist für Add Song -->
+        <!-- <li class="nav-item active">
           <a class="nav-link" href=""><router-link
             :to="{ name: 'add-song' }"
             class="navbar-brand"
             >Add Song
           </router-link><span class="sr-only">(current)</span></a>
+        </li> -->
           <li class="nav-item active">
             <a class="nav-link" href=""><router-link
               :to="{ name: 'my-playlist' }"
               class="navbar-brand"
               >My Playlists
-            </router-link><span class="sr-only">(current)</span></a>
-        </li>
+            </router-link></a>
+          </li>
+          <li class="navbar-brand ">
+            <a class="nav-link active" href="/accounts/logout/">Logout</a>
+          </li>
       </ul>
     </div>
     </div>
@@ -34,9 +39,17 @@
 </template>
 
 <script>
-  export default {
-    name: 'navbar'
+export default {
+  name: 'navbar',
+  data() {
+    return {
+
+    }
+  },
+  methods: {
+
   }
+}
 </script>
 
 <style scoped>

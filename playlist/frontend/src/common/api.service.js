@@ -20,7 +20,8 @@ function apiService(endpoint, method, data) {
   };
   return fetch(endpoint, config)
           .then(handleResponse)
-          .catch(error => console.error(error))
+          .catch()
+          // .catch(error => console.error(error))
 }
 
 export { apiService };

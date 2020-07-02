@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block style %}
+<style media="screen">
+      html, body {
+        height: 100%;
+        font-family: 'MuseoModerno', serif;
+      }
+      .auth-box {
+        border: 3px solid lightgrey;
+        border-radius: 10px;
+        padding-top: 25px;
+        padding-bottom: 25px;
+
+        margin: auto;
+    }
+
+      .login-form-container{
+        width: 300px;
+        margin: auto;
+      }
+      .registration-form-container {
+        width: 400px;
+        margin: auto;
+      }
+      .outer-area {
+        margin-top: 150px;
+      }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-4 col-md-2 col-1"></div>
+  <div class="outer-area auth-box text-center col-lg-4 col-md-8 col-10">
+    {% block auth %}
+    {% endblock %}
+  </div>
+  <div class="col-lg-4 col-md-2 col-1"></div>
+</div>
+
+{% endblock %}
+
+
+<!--
+<div class="outer-area">
+  <div class="auth-box text-center">
+    {% block auth1 %}
+
+    {% endblock %}
+  </div>
+</div>
+
+-->
