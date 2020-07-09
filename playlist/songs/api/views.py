@@ -3,10 +3,22 @@ from rest_framework.views import APIView
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from songs.api.serializers import (
-    SongSerializer, PlaylistSerializer, PlaylistWOSongDetailsSerializer,
-    SongIDSerializer)
+    SongSerializer, PlaylistSerializer, PlaylistIDSerializer,
+    SongIDSerializer, SongSerializerWOPlaylistInfo)
 from songs.models import Song, Playlist
 from rest_framework.permissions import IsAuthenticated
+
+
+class AllSongsViewSet(viewsets.ModelViewSet):
+    serializer_class = SongSerializerWOPlaylistInfo
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Song.objects.all().order_by("-id")
+        # return self.request.user.accounts.all()
+
+    def perform_create(self, serializer):
+        serializer.save(creator=self.request.user)
 
 
 class UsersSongsViewSet(viewsets.ModelViewSet):
@@ -40,8 +52,8 @@ class UsersPlaylistViewSet(viewsets.ModelViewSet):
         serializer.save(owner=self.request.user)
 
 
-class UsersPlaylistWOSongDetailsViewSet(viewsets.ModelViewSet):
-    serializer_class = PlaylistWOSongDetailsSerializer
+class UsersPlaylistIDViewSet(viewsets.ModelViewSet):
+    serializer_class = PlaylistIDSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):

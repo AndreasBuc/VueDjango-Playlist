@@ -1,94 +1,131 @@
 <template>
-  <div class="myPlaylists">
+  <div class="myplaylist">
     <div class="centerthecontext">
-      <h1>See your Playlists</h1>
-      <h3 class="lead"> Here are all the songs in your Playlists</h3>
+      <h1>My Playlists</h1>
+      <h3 class="lead"> Here are all your playlists and songs</h3>
       <hr class="blueline">
     </div>
-    <div class="row">
-      <div class="col-3 text-c">
-        <!-- Hier ist die Leiste -->
-        <div  v-for="playlist in playlists"
-              :key="playlist.id"
-        >
-          <div id="list-example" class="list-group">
-            <a class="list-group-item text-c list-group-item-action" :href="'#'+playlist.id">{{playlist.name}}</a>
-          </div>
+    <!-- Add a new Playlist to your Account -->
+    <div class="row ">
+      <div class="col-3 d-flex justify-content-center middleline">
+        <input v-model="name" placeholder = " Add a new playlist" type="text">
+      </div>
+      <div class="col-1">
+        <!-- Add Button -->
+        <div @mouseover="addhover = true" class="mx-1" >
+          <a @click="onSubmit" href=""><img v-if="!addhover" class="icon" alt="Edit" src="../assets/add.svg"></a>
         </div>
+
+        <div @mouseleave="addhover = false" class="mx-1">
+          <a @click="onSubmit" href=""><img v-if="addhover" class="icon" alt="Edit" src="../assets/add-hover.svg"></a>
+        </div>
+        {{error}}
       </div>
 
-    <div class="col-9">
-      <!-- Hier ist der Inhalt -->
-      <div data-spy="scroll" data-target="#list-example" data-offset="0" class="scrollspy-example">
-        <div  v-for="playlist in playlists"
-              :key="playlist.id"
-        >
-        <h4 :id="playlist.id">{{playlist.name}}</h4>
-        <h4 v-if="playlist.is_empty" class="lead mb-3" >Noch kein Song in dieser Playliste</h4>
-        <div
-          v-for="(song,index) in playlist.songs"
-          :key = "index">
-          <SingleSong
-          :id= song.id
-          :showPlaylist="false"
-          />
+      <!-- END - Add a new Playlist to your Account -->
+    </div>
+    <br>
+    <!-- Table with all the data -->
+    <div  class="row"
+          v-for="playlist in playlists"
+          :key=playlist.id
+          >
+        <div class="col-3 middleline">
+          <PlaylistInPlaylists
+          :PlaylistName = playlist.name
+          :PlaylistID = playlist.id
+          >
+          </PlaylistInPlaylists>
+
 
         </div>
-      </div>
-      </div>
+        <div class="col-9 ">
+          <SongsInPlaylist
+            v-for="song in playlist.songs"
+            :key="song.id"
+            class="d-flex justify-content-center"
+            :SongId="song.id"
+          >
+        </SongsInPlaylist>
+        <hr>
+        </div>
     </div>
 
-    </div>
   </div>
 </template>
 
 <script>
-import SingleSong from "@/components/SingleSong"
-import { apiService } from "@/common/api.service.js"
+import { apiService } from "@/common/api.service.js";
+import SongsInPlaylist from "@/components/SongsInPlaylist.vue"
+import PlaylistInPlaylists from "@/components/PlaylistInPlaylists.vue"
+
 export default {
   name: 'MyPlaylist',
   components: {
-    SingleSong
+    SongsInPlaylist,
+    PlaylistInPlaylists,
   },
   data() {
     return {
       playlists: [],
+      addhover: false,
+      error: null,
+      name: null,
     }
   },
   methods: {
-    getPlaylists() {
-      let endpoint = "/api/playlists/";
-      console.log('GET Playlist /api/playlists/')
+    getMyPlaylistsIDs() {
+      let endpoint = "/api/users-playlists/";
       apiService(endpoint)
-      .then(data => {
-        console.log(data);
-        this.playlists = data;
+      .then(playlists => {
+        this.playlists=playlists;
       })
     },
+    async onSubmit(){
+        if(!this.name){
+          this.error = "You cannot send an empty Name!";
+        } else if (this.name.length > 240) {
+        this.error = "Ensure this field has no more than 240 char ";
+        }  else {
+          let endpoint = "/api/users-playlists/";
+          let method = "POST";
+
+          await apiService(endpoint, method, {name: this.name})
+          .then(
+            this.getMyPlaylistsIDs()
+            // this.$router.push({
+            //   name: 'my-playlist'
+            // })
+          )
+        }
+      }
 
   },
   created() {
-    this.getPlaylists()
+    this.getMyPlaylistsIDs()
   }
 }
 </script>
 
 <style scoped>
-.text-c {
-  background-color: #4a4e4d;
-  border-color: #4a4e4d;
-  color: #63ace5;
-}
-.text-c:hover {
-
-  border-color: #63ace5;
-  color: #63ace5;
-}
-.blueline {
-  border: solid 1px #63ace5;
-}
 .centerthecontext {
   text-align: center;
-
 }
+.middleline {
+  border-style: none solid none none;
+  border-color: #63ace5
+}
+input:not(.userListBox){
+  background:transparent !important;
+  border: none !important;
+  outline: none !important;
+  padding: 0px 0px 0px 0px !important;
+  color: #63ace5;
+}
+.icon {
+  height: 24px;
+  weight: 24px;
+  padding: 2px 2px 2px 2px  ;
+}
+
 </style>

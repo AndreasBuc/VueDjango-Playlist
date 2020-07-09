@@ -52,19 +52,55 @@
 
                 </div>
                 <div class="modal-body">
-                  <div class="btn-group-vertical">
-                    <a  href=""
-                        >
-                      <button
-                        v-for="playlist in PlaylistsNotInYet"
-                        :key="playlist.id"
-                        @click="AddToPlaylist(playlist.id)"
-                        class="btn btn-outline-dark modal-style"
-                        data-dismiss="modal"
-                        >{{playlist.name}}
-                      </button>
-                    </a>
+                  <!-- Here is the content of the Model -->
+                  <div class="row">
+                    <div class="col-6">
+                      <h5>Add Song to Playlist</h5>
+                    </div>
+                    <div class="col-6">
+                      <h5>Remove Song from Playlist</h5>
+                    </div>
                   </div>
+                  <div class="row">
+
+                    <!-- Add Song to Playlist -->
+
+                    <div class="col-6">
+                      <div class="btn-group-vertical">
+                        <a  href=""
+                            >
+                          <button
+                            v-for="playlist in PlaylistsNotInYet"
+                            :key="playlist.id"
+                            @click="AddToPlaylist(playlist.id)"
+                            class="btn btn-outline-dark modal-style"
+                            data-dismiss="modal"
+                            >{{playlist.name}}
+                          </button>
+                        </a>
+                      </div>
+                    </div>
+
+                    <!-- Remove Song from Playlist -->
+
+                    <div class="col-6">
+                      <div class="btn-group-vertical">
+                        <a  href=""
+                            >
+                          <button
+                            v-for="playlist in song.playlists"
+                            :key="playlist.id"
+                            @click="RemoveFromPlaylist(playlist.id)"
+                            class="btn btn-outline-dark modal-style"
+                            data-dismiss="modal"
+                            >{{playlist.name}}
+                          </button>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- END Here ends the contend of the Modal -->
                 </div>
               </div>
             </div>
@@ -109,7 +145,7 @@ export default {
       })
     },
     getPlaylists() {
-      let endpoint = "/api/users-playlists-wo-spongs-details/";
+      let endpoint = "/api/users-playlists/";
       apiService(endpoint)
       .then(playlists => {
 
@@ -154,9 +190,7 @@ export default {
           try {
             await apiService(endpoint, "POST")
               .then(()=> {
-                this.$router.push({
-                  name: 'home'
-                })
+                this.getSong()
               })
             // this.$delete(this.answers, this.answers.indexOf(answer))
             // this.userHasAnswered = false;
@@ -165,6 +199,20 @@ export default {
             console.log(err)
           }
         },
+        async RemoveFromPlaylist(p_pk) {
+            let endpoint = `/api/users-add-remove-song/${p_pk}/${this.songID}/`;
+            try {
+              await apiService(endpoint, "DELETE")
+                .then(()=> {
+                  this.getSong()
+                })
+              // this.$delete(this.answers, this.answers.indexOf(answer))
+              // this.userHasAnswered = false;
+            }
+            catch (err) {
+              console.log(err)
+            }
+          },
     },
   created() {
     this.setBackHoverValue()
@@ -183,6 +231,7 @@ export default {
       });
       return addPlaylist;
     },
+
   },
   // hier hört computed auf
 }

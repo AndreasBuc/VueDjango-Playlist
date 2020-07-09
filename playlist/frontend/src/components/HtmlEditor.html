@@ -1,11 +1,24 @@
 <template>
-
+<p>{{PlaylistName}}</p>
 </template>
 
 <script>
 import { apiService } from "@/common/api.service.js"
 export default {
+  name: 'PlaylistInPlaylists',
+  props: {
+    PlaylistName: String,
+    PlaylistID: Number,
+  },
+  data() {
+    return {
+      name: this.PlaylistName,
+      id: this.PlaylistID,
+    }
+  }
+  methods: {
 
+  }
 }
 </script>
 

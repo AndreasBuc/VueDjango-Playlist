@@ -4,9 +4,8 @@
       <h1>Hallo {{requestUser}}</h1>
       <h3 class="lead"> Here are all your songs</h3>
       <h3></h3>
-      <hr class="blueline">
+      <hr>
     </div>
-
     <table class="table table-hover table-borderless">
       <thead v-if="!showaddSong && !StartedAdding" @mouseover="showaddSong = true">
         <tr>
@@ -18,8 +17,9 @@
         </tr>
       </thead>
       <tbody>
+
         <!-- add new Song to Database -->
-        <tr v-if="showaddSong || StartedAdding" @mouseleave="showaddSong = false">
+        <tr v-if="showaddSong  || StartedAdding" @mouseleave="showaddSong = false">
             <th class="likeplaceholer" scope="row">{{songs_ids.length+1}}</th>
             <td><input v-model="title" placeholder="enter title" type="text"></td>
             <td><input v-model="artist" placeholder="enter artist" type="text"></td>
@@ -39,10 +39,10 @@
                     <!-- delete, what you have added so far -->
                   <li class="nav-item mx-1" v-if="StartedAdding">
                     <div @mouseover="deletehover = true" >
-                      <a @click="deleteAdding" href=""><img v-if="!deletehover" class="icon" alt="Edit" src="../assets/delete.svg"></a>
+                      <a @click="deleteAdding" style="cursor: pointer"><img v-if="!deletehover" class="icon" alt="Edit" src="../assets/delete.svg"></a>
                     </div>
                     <div @mouseleave="deletehover = false" >
-                      <a @click="deleteAdding" href=""><img v-if="deletehover" class="icon" alt="Edit" src="../assets/delete-hover.svg"></a>
+                      <a @click="deleteAdding" style="cursor: pointer"><img v-if="deletehover" class="icon" alt="Edit" src="../assets/delete-hover.svg"></a>
                     </div>
                   </li>
                 </ul>
@@ -54,7 +54,6 @@
               :key="song.id"
               :id="song.id"
               :index="(songs_ids.length+1) - (index+1)">
-
         </RowInSongsTable>
 
         <tr class="noborder">
@@ -66,6 +65,10 @@
         </tr>
       </tbody>
     </table>
+    <hr>
+    <div class="centerthecontext">
+      <h4 class="mute-color"> Add new Songs by hoveruing over the Heading in the Table</h4>
+    </div>
   </div>
 </template>
 
@@ -94,13 +97,14 @@ export default {
   computed: {
     //check, if the user started adding new data
     StartedAdding() {
-      if(this.title != '' || this.artist != '' || this.duration != '') {
-        return true
+      // TODO Edit this logic, so that if I type something and delete it, then it shell vanish
+      if((this.title != null && this.title != '') || (this.artist != null && this.artist != '') || (this.duration != null && this.duration != '')) {
+        return true;
       } else {
-        return false
+        return false;
       }
 
-    }
+    },
   },
   methods: {
     setRequestUser() {
@@ -136,16 +140,14 @@ export default {
         } else if (this.title.length > 240) {
         this.error = "Ensure this field has no more than 240 char ";
         }  else {
-          let endpoint = "/api/users-songs/";
+          let endpoint = "/api/songs/";
           let method = "POST";
 
           await apiService(endpoint, method, {  title: this.title,
                                                 artist: this.artist,
                                                 duration: this.duration})
           .then(
-            this.$router.push({
-              name: 'home'
-            })
+            this.getSongsIDs()
           )
         }
       }
@@ -205,5 +207,11 @@ table, th, td {
   border: solid 2px #4a4e4d !important;
   background:transparent !important;
   color: #4a4e4d;
+}
+.mute-color {
+  color: #424645;
+}
+.mute-color:hover {
+  color: #63ace5;
 }
 </style>

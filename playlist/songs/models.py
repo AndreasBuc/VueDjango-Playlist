@@ -3,7 +3,7 @@ from django.conf import settings
 
 
 class Song(models.Model):
-    title = models.CharField(max_length=256, unique=True)
+    title = models.CharField(max_length=256,)
     artist = models.CharField(max_length=256, blank=True, null=True)
 
     duration = models.PositiveIntegerField(blank=True, null=True)
