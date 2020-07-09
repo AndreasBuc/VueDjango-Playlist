@@ -1,27 +1,37 @@
 <template>
-  <tr @mouseleave="deletehover = false; edithover = false; addhover=false" >
+  <tr @mouseleave= "deletehover = false;
+                    edithover = false;
+                    addhover = false;
+                    saveEdithover = false;
+                    undoEdithover = false"
+      @dblclick= "setTitleArtistDuration">
     <th scope="row">{{songIndex}}</th>
-    <td>{{song.title}}</td>
-    <td>{{song.artist}}</td>
-    <td>{{setDuration(song.duration)}}</td>
+
+    <!-- STATIC Rows, when it is not being edit -->
+    <td v-if="!editRow">{{song.title}}</td>
+    <td v-if="!editRow">{{song.artist}}</td>
+    <td v-if="!editRow">{{setDuration(song.duration)}}</td>
+
+    <!-- EDIT Rows, when it is being edit -->
+
+    <td v-if="editRow"><form @submit.prevent="saveEdit"><input v-model="title" placeholder="enter title" type="text"></form></td>
+    <td v-if="editRow"><form @submit.prevent="saveEdit"><input v-model="artist" placeholder="enter artist" type="text"></form></td>
+    <td v-if="editRow"><form @submit.prevent="saveEdit"><input v-model="duration" placeholder="enter duration in sec" type="number"></form></td>
+
     <td>
-      <ul class="nav">
+      <ul v-if=!editRow class="nav">
         <!-- EDIT the song -->
         <li class="nav-item mx-1">
-          <router-link
-            :to="{ name: 'song-editor', params: {id: song.id} }"
-            ><a
-            href="">
-
+            <a class="pointer">
             <div @mouseover="edithover = true">
               <img v-if="!edithover" class="icon" alt="Edit" src="../assets/edit.svg">
             </div>
             <div @mouseleave="edithover = false">
-              <img v-if="edithover" class="icon" alt="Edit" src="../assets/edit-hover.svg">
+              <img v-if="edithover" @click="setTitleArtistDuration" class="icon" alt="Edit" src="../assets/edit-hover.svg">
             </div>
           </a>
-          </router-link>
         </li>
+
         <!-- DELETE the song -->
         <li class="nav-item mx-1" >
           <div @mouseover="deletehover = true" >
@@ -31,6 +41,7 @@
             <a @click="deleteSong" href=""><img v-if="deletehover" class="icon" alt="Edit" src="../assets/delete-hover.svg"></a>
           </div>
         </li>
+
         <!-- ADD the song to a playlist-->
         <li class="nav-item mx-1" >
           <div @mouseover="addhover = true" data-toggle="modal" data-target="'#AddToPlaylistModal'+ songID" >
@@ -45,7 +56,7 @@
             <div class="modal-dialog">
               <div class="modal-content modal-style">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">Choose a Playlist</h5>
+                  <h5 class="modal-title" id="exampleModalLabel">{{song.title}} || {{song.artist}}</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
@@ -109,6 +120,30 @@
 
         </li>
       </ul>
+      <!-- EDIT the SONG -->
+      <ul v-if=editRow class="nav">
+
+        <!-- Save the Change -->
+        <li class="nav-item mx-1" >
+          <div @mouseover="saveEdithover = true" @mouseleave="saveEdithover = false">
+            <!-- no hover -->
+              <img class="icon" v-if="!saveEdithover" alt="save" src="../assets/save.svg">
+            <!-- hover -->
+              <img class=" icon pointer" @click="saveEdit" v-if="saveEdithover" alt="save" src="../assets/save-hover.svg">
+          </div>
+        </li>
+        
+        <!-- Discard changes -->
+        <li class="nav-item mx-1" >
+          <div @mouseover="undoEdithover = true" @mouseleave="undoEdithover = false">
+            <!-- no hover -->
+              <img v-if="!undoEdithover" class="icon" alt="save" src="../assets/undo.svg">
+            <!-- hover -->
+              <img v-if="undoEdithover" class="icon pointer" @click="editRow=!editRow" alt="save" src="../assets/undo-hover.svg">
+          </div>
+        </li>
+      </ul>
+
     </td>
   </tr>
 
@@ -133,6 +168,13 @@ export default {
       plushover: false,
       minushover: false,
       addhover: false,
+      editRow: false,
+      saveEdithover: false,
+      undoEdithover: false,
+      error: null,
+      title: null,
+      artist: null,
+      duration: null,
     }
   },
   methods: {
@@ -152,11 +194,31 @@ export default {
         this.playlists=playlists;
       })
     },
+    async saveEdit() {
+      console.log("saveEdit wurde gedrückt");
+      if(!this.title){
+        console.log('if(!this.title){');
+        this.error = "You cannot send an empty title!";
+      } else if (this.title.length > 240) {
+      this.error = "Ensure this field has no more than 240 char ";
+      }  else {
+        let endpoint = `/api/songs/${this.songID}/`;
+        let  method = "PUT";
+        await apiService(endpoint, method, { title: this.title, artist: this.artist, duration: this.duration})
+        .then(
+
+        )
+      }
+      this.editRow = false;
+      this.getSong();
+    },
     setBackHoverValue() {
       this.edithover= false;
       this.deletehover= false;
       this.plushover= false;
       this.minushover= false;
+      this.saveEdithover= false;
+
     },
     setDuration(duration) {
       if (duration == null) {
@@ -164,9 +226,13 @@ export default {
       }
       var sec = duration % 60 ;
       var min = (duration-sec)/60;
+      if (sec < 10){
+        sec= '0' + sec
+      }
       if (sec==0){
         sec= '00'
       }
+
       return min + ':' + sec
     },
     async deleteSong() {
@@ -212,11 +278,17 @@ export default {
             catch (err) {
               console.log(err)
             }
-          },
+        },
+      setTitleArtistDuration() {
+        this.title = this.song.title;
+        this.artist = this.song.artist;
+        this.duration = this.song.duration;
+        this.editRow = true;
+      },
     },
   created() {
-    this.setBackHoverValue()
     this.getSong()
+    this.setBackHoverValue()
   },
   // Hier fängt computed an
   computed: {
@@ -251,4 +323,16 @@ table, th, td {
   background-color: #4a4e4d;
   color: #63ace5;
 }
+
+input:not(.userListBox){
+  background:transparent !important;
+  border: none !important;
+  outline: none !important;
+  padding: 0px 0px 0px 0px !important;
+  color: #63ace5;
+}
+.pointer{
+  /* https://stackoverflow.com/questions/3087975/make-the-cursor-a-hand-when-a-user-hovers-over-a-list-item */
+  cursor: pointer;
+ }
 </style>
